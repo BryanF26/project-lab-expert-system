@@ -1,3 +1,26 @@
+(deftemplate fire
+    (slot name)
+    (slot damage)
+    (slot defense)
+    (slot level)
+    (slot burnDamage)
+    (slot price)
+)
+
+(deftemplate water
+    (slot name)
+    (slot damage)
+    (slot defense)
+    (slot level)
+    (slot price)
+)
+
+(deffunction clearScreen ()
+	(for (bind ?i 0) (< ?i 25) (++ ?i)
+    	(printout t crlf)
+    )
+)
+
 (deffunction menu()
  	(printout t "+======================+" crlf)
 	(printout t "| Flokemon Store       |" crlf)
@@ -11,33 +34,42 @@
 	(printout t "+======================+" crlf)   
 )
 
-(deffunction view ()
-    
+(deffunction viewFlokemon ()
+    (bind ?choose 0)
+    (while (neq ?choose 3)
+    	(printout t "Choose Flokemon Type to view" crlf)
+		(printout t "1. Fire Flokemon" crlf)
+		(printout t "2. Water Flokemon" crlf)
+		(printout t "3. Back" crlf)
+		(printout t "Choose :" crlf)
+        (bind ?choose (read))
+	)
 )
 
-(deffunction add ()
-    
+(deffunction addFlokemon ()
+    (bind ?add 0)
 )
 
-(deffunction update ()
-    
+(deffunction updateFlokemon ()
+    (bind ?update 0)
 )
 
-(deffunction remove ()
-    
+(deffunction removeFlokemon ()
+    (bind ?remove 0)
 )
 
-(deffunction find ()
-    
+(deffunction findFlokemon ()
+    (bind ?find 0)
 )
 
-(deffunction main ()
+(deffunction mainFlokemon ()
     (bind ?menus 0)
-	(while (eq ?menus 6)
+	(while (neq ?menus 6)
+    	(clearScreen)
     	(menu)
     	(printout t "Choose : ")
     	(bind ?menus (read))
 	)
 )
 
-(main)
+(mainFlokemon)
