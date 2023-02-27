@@ -34,6 +34,13 @@
 	(printout t "+======================+" crlf)   
 )
 
+(deffunction viewFire()
+	(printout t "===============================================================================" crlf)
+    (printout t "|No. |Name                      |Damage    |Defense   |Level     |Price       |" crlf)
+    (printout t "===============================================================================" crlf)
+    (printout t)
+    (printout t "===============================================================================" crlf)
+)
 (deffunction viewFlokemon ()
     (bind ?choose 0)
     (while (neq ?choose 3)
@@ -43,6 +50,7 @@
 		(printout t "3. Back" crlf)
 		(printout t "Choose :" crlf)
         (bind ?choose (read))
+        (if (eq (numberp ?choose) FALSE) then (bind ?choose 0))
 	)
 )
 
@@ -63,13 +71,33 @@
 )
 
 (deffunction mainFlokemon ()
+    (reset)
     (bind ?menus 0)
 	(while (neq ?menus 6)
     	(clearScreen)
     	(menu)
     	(printout t "Choose : ")
     	(bind ?menus (read))
+        (if (eq (numberp ?menus) FALSE) 
+            then (bind ?menus 0)
+        elif (eq ?menus 1) 
+            then (viewFlokemon)
+        elif (eq ?menus 2)
+            then (addFlokemon)
+        elif (eq ?menus 3) 
+            then (updateFlokemon)
+        elif (eq ?menus 4) 
+            then (removeFlokemon)
+        elif (eq ?menus 5) 
+            then (findFlokemon)
+        else
+            (printout t "Thankyou..." crlf)
+            (clear)
+        )
 	)
 )
 
 (mainFlokemon)
+
+
+
