@@ -15,7 +15,7 @@
     (slot price)
 )
 
-(defglobal 
+(defglobal
     ?*idx* = 1
     ?*totalFire* = 5
     ?*totalWater* = 5
@@ -25,7 +25,8 @@
     (printFire)
 	(flokemonFire (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (burnDamage ?bd) (price ?p))
 	=>
-    (printout t "| " ?*idx* " | " ?n " | " ?dmg " | " ?def " | " ?lvl " | " ?bd " | " ?p " |" crlf)
+    (format t "|%d.  |%-21s|%-10d|%-10d|%-8d|%-14d|%-9d|" ?*idx* ?n ?dmg ?def ?lvl ?bd ?p)
+    (printout t crlf)
     (++ ?*idx*)
 )
 
@@ -33,32 +34,61 @@
     (printWater)
 	(flokemonWater (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (price ?p))
 	=>
-    (printout t "| " ?*idx* " | " ?n " | " ?dmg " | " ?def " | " ?lvl " | " ?p " |" crlf)
+    (format t "|%d.  |%-21s|%-10d|%-10d|%-8d|%-9d|" ?*idx* ?n ?dmg ?def ?lvl ?p)
+    (printout t crlf)
     (++ ?*idx*)
 )
 
 (defrule update-fire
-	(updateFire ?num ?name ?damage ?defense ?level ?price ?burnDamage)
-    ?i <- (flokemonFire (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
+	?a <- (updateFire ?num ?name ?damage ?defense ?level ?burnDamage ?price)
+    ?i <- (flokemonFire (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (burnDamage ?bd) (price ?p))
 	=>
-    (bind ?is TRUE)
-    (while (?is) 
-        ()
+    (if (eq ?num ?*idx*) then
+        (modify ?i (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
+    	(retract ?a)
+        (bind ?*idx* 1)
+    else
+        (++ ?*idx*)
     )
-    (printout t ?num)
-    (modify ?num (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
 )
 
 (defrule update-water
-	(updateWater ?num ?name ?damage ?defense ?level ?price ?burnDamage)
-    ?i <- (flokemonFire (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
+	?a <- (updateWater ?num ?name ?damage ?defense ?level ?price)
+    ?i <- (flokemonWater (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (price ?p))
 	=>
-    (bind ?is TRUE)
-    (while (?is) 
-        ()
+    (if (eq ?num ?*idx*) then
+        (modify ?i (name ?name) (damage ?damage) (defense ?defense) (level ?level) (price ?price))
+    	(retract ?a)
+        (bind ?*idx* 1)
+    else
+        (++ ?*idx*)
     )
-    (modify ?num (name ?name) (damage ?damage) (defense ?defense) (level ?level)  (price ?price))
-    (modify ?num flokemonFire (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
+)
+
+(defrule remove-fire
+    ?a <- (removeFire ?num)
+    ?i <- (flokemonFire (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (burnDamage ?bd) (price ?p))
+    =>
+    (if (eq ?num ?*idx*) then
+        (retract ?i)
+    	(retract ?a)
+        (bind ?*idx* 1)
+    else
+        (++ ?*idx*)
+    )
+)
+
+(defrule remove-water
+    ?a <- (removeWater ?num)
+    ?i <- (flokemonWater (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (price ?p))
+    =>
+    (if (eq ?num ?*idx*) then
+        (retract ?i)
+    	(retract ?a)
+        (bind ?*idx* 1)
+    else
+        (++ ?*idx*)
+    )
 )
 
 (deffunction clearScreen ()
@@ -83,25 +113,24 @@
 (deffunction printFlokemonType(?type)
     (if (eq ?type "fire") then
         (printout t "Fire Flokemon List" crlf)
-  		(printout t "=======================================================================" crlf)
-    	(printout t "|No. |Name    |Damage    |Defense   |Level   |Burn Damage   |Price    |" crlf)
-    	(printout t "=======================================================================" crlf)
+  		(printout t "====================================================================================" crlf)
+    	(printout t "|No. |Name                 |Damage    |Defense   |Level   |Burn Damage   |Price    |" crlf)
+    	(printout t "====================================================================================" crlf)
     	(assert (printFire))
         (run)
         (retract-string "(printFire)")
-        (facts)
-    	(printout t "=======================================================================" crlf)  	    
+    	(printout t "====================================================================================" crlf)  	    
     )
     
     (if (eq ?type "water") then
         (printout t "Water Flokemon List" crlf)
-		(printout t "==========================================================" crlf)
-    	(printout t "|No. |Name    |Damage    |Defense   |Level     |Price    |" crlf)
-    	(printout t "==========================================================" crlf)
+		(printout t "=====================================================================" crlf)
+    	(printout t "|No. |Name                 |Damage    |Defense   |Level   |Price    |" crlf)
+    	(printout t "=====================================================================" crlf)
     	(assert (printWater))
         (run)
         (retract-string "(printWater)")
-    	(printout t "==========================================================" crlf)		        
+    	(printout t "=====================================================================" crlf)		        
     )
     (bind ?*idx* 1)
 )
@@ -115,16 +144,28 @@
 		(printout t "3. Back" crlf)
 		(printout t "Choose :" crlf)
         (bind ?view (read))
-        (if (eq (numberp ?view) FALSE) 
-            then (bind ?view 0)
-        elif(eq ?view 1)
-            then (printFlokemonType "fire")
-        elif(eq ?view 2)
-            then (printFlokemonType "water")
+        (if (eq (numberp ?view) FALSE) then
+            (bind ?view 0)
+        elif(eq ?view 1) then
+            (printFlokemonType "fire")
+        elif(eq ?view 2) then
+            (printFlokemonType "water")
         )
         (printout t "Press Enter To Continue..")
         (readline)
 	)
+)
+
+(deffunction promptString (?param1 ?param2 ?message)
+    (bind ?choice "")
+    (while (and (neq ?choice ?param1) (neq ?choice ?param2))
+        (printout t ?message)
+        (bind ?choice (readline))
+        (if (eq (lexemep ?choice) FALSE) then
+            (bind ?choice "")
+        )
+    )
+    (return ?choice)
 )
 
 (deffunction promptStringWithLength(?lowerBound ?upperBound ?message)
@@ -132,20 +173,20 @@
 	(while (or (< (str-length ?string) ?lowerBound) (> (str-length ?string) ?upperBound))
         (printout t ?message)
         (bind ?string (readline))
-        (if (eq (lexemep ?string) FALSE) 
-            then (bind ?string "")
+        (if (eq (lexemep ?string) FALSE) then
+            (bind ?string "")
         )
     )
     (return ?string)
 )
-
+ 
 (deffunction promptIntegerWithLength(?lowerBound ?upperBound ?message)
     (bind ?num 0)
 	(while (or (< ?num ?lowerBound) (> ?num ?upperBound))
         (printout t ?message)
         (bind ?num (read))
-        (if (eq (numberp ?num) FALSE) 
-            then (bind ?num 0)
+        (if (eq (numberp ?num) FALSE) then
+            (bind ?num 0)
         )
     )
     (return ?num)
@@ -167,7 +208,7 @@
     (++ ?*totalFire*)
     
     (assert(flokemonFire (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price)))
-    
+
 )
 
 (deffunction addFlokemonWater ()
@@ -196,21 +237,14 @@
 		(printout t "3. Back" crlf)
 		(printout t "Choose :" crlf)
         (bind ?add (read))
-        (if (eq (numberp ?add) FALSE) 
-            then (bind ?add 0)
-        elif(eq ?add 1)
-            then 
+        (if (eq (numberp ?add) FALSE) then
+            (bind ?add 0)
+        elif(eq ?add 1) then 
             (addFlokemonFire)
             (printout t "Flokemon successfully added..." crlf)
-        	(printout t "Press Enter To Continue..")
-            (readline)
-            (printFlokemonType "fire")
-        elif(eq ?add 2)
-            then (addFlokemonWater)
+        elif(eq ?add 2) then 
+            (addFlokemonWater)
  			(printout t "Flokemon successfully added..." crlf)
-        	(printout t "Press Enter To Continue..")
-            (readline)
-            (printFlokemonType "water")
         )
         (printout t "Press Enter To Continue..")
         (readline)
@@ -226,6 +260,9 @@
             (bind ?num 0)
         )
     )
+    
+    (bind ?num (+ (- ?*totalFire* ?num) 1))
+    
     (bind ?name (promptStringWithLength 5 25 "Insert Flokemon Name [5 - 25 Character] : "))
 
     (bind ?damage (promptIntegerWithLength 10 5000 "Insert Flokemon Damage [10 - 5000] : "))
@@ -238,10 +275,9 @@
  
 	(bind ?burnDamage (promptIntegerWithLength 5 100 "Insert Flokemon Burn Damage [5 - 100] : "))
     
+    (assert (updateFire ?num ?name ?damage ?defense ?level ?burnDamage ?price))
     
-    (assert (updateFire ?num ?name ?damage ?defense ?level ?price ?burnDamage))
     (run)
-    (retract-string "(updateFire)")
 )
 
 (deffunction updateFlokemonWater()
@@ -254,7 +290,7 @@
         )
     )
     
-    (bind ?num (+ (- ?*totalWater ?num) 1))
+    (bind ?num (+ (- ?*totalWater* ?num) 1))
     
     (bind ?name (promptStringWithLength 5 25 "Insert Flokemon Name [5 - 25 Character] : "))
 
@@ -267,8 +303,8 @@
     (bind ?price (promptIntegerWithLength 1000 1000000 "Insert Flokemon Price [1000 - 1000000] : "))        
     
     (assert (updateWater ?num ?name ?damage ?defense ?level ?price))
+    
     (run)
-    (retract-string "(updateWater)")
 )
 
 (deffunction updateFlokemon ()
@@ -286,12 +322,10 @@
             (printFlokemonType "fire")
             (updateFlokemonFire)
             (printout t "Successfully update fire flokemon!" crlf)
-            (printFlokemonType "fire")
         elif(eq ?update 2) then 
             (printFlokemonType "water")
             (updateFlokemonWater)
             (printout t "Successfully update water flokemon!" crlf)
-            (printFlokemonType "water")
         )
         (printout t "Press Enter To Continue..")
         (readline)
@@ -307,11 +341,8 @@
             (bind ?num 0)
         )
     )
-	;(retract ?num (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burnDamage ?burnDamage) (price ?price))
-    (bind ?flok-fire (nth$ ?num flokemonFire))
-    (printout t ?flok-fire:name crlf)
-    (printout t ?flok-fire:damage crlf)
-    (printout t ?flok-fire:defense crlf)
+    (assert (removeFire ?num))
+    (run)
 )
 
 (deffunction removeFlokemonWater()
@@ -324,8 +355,8 @@
             (bind ?num 0)
         )
     )
-        
-    ;(retract ?num (name ?name) (damage ?damage) (defense ?defense) (level ?level)  (price ?price))
+    (assert (removeWater ?num))
+    (run)
 )
 
 (deffunction removeFlokemon ()
@@ -343,12 +374,10 @@
             (printFlokemonType "fire")
             (removeFlokemonFire)
             (printout t "Successfully deleted!" crlf)
-            (printFlokemonType "fire")
         elif(eq ?remove 2) then 
             (printFlokemonType "water")
             (removeFlokemonWater)
             (printout t "Successfully deleted!" crlf)
-            (printFlokemonType "water")
         )
         (printout t "Press Enter To Continue..")
         (readline)
@@ -356,7 +385,28 @@
 )
 
 (deffunction findFlokemon ()
-    (bind ?find 0)
+    (printout t "Find Flokemon" crlf)
+    (printout t "-----------------" crlf)
+    
+    (bind ?type (promptString "Fire" "Water" "Demanded type [Fire | Water] : "))
+    
+    (bind ?power (promptString "Weak" "Strong" "Demanded power [Weak | Strong] : "))
+    
+    (bind ?defense (promptString "Soft" "Hard" "Demanded type [Soft | Hard] : "))
+    
+	(bind ?level (promptIntegerWithLength 1 100 "Demanded minimum flokemon level [1 - 100] : "))
+    
+    (bind ?budget (promptIntegerWithLength 1000 1000000 "Budget for flokemon [1000 - 1000000] : "))
+
+    (bind ?confirmation (promptString "Y" "N" "Are you sure to find this type of flokemon [Y | N] ? "))
+    
+    (if (eq ?confirmation "Y") then
+    	
+    )
+	
+    (printout t "Press Enter To Continue..")
+    (readline)
+    
 )
 
 (deffacts inserts
@@ -377,22 +427,23 @@
     (reset)
     (bind ?menus 0)
 	(while (neq ?menus 6)
+        (run)
     	(clearScreen)
     	(menu)
     	(printout t "Choose : ")
     	(bind ?menus (read))
-        (if (eq (numberp ?menus) FALSE) 
-            then (bind ?menus 0)
-        elif (eq ?menus 1) 
-            then (viewFlokemon)
-        elif (eq ?menus 2)
-            then (addFlokemon)
-        elif (eq ?menus 3) 
-            then (updateFlokemon)
-        elif (eq ?menus 4) 
-            then (removeFlokemon)
-        elif (eq ?menus 5) 
-            then (findFlokemon)
+        (if (eq (numberp ?menus) FALSE) then
+            (bind ?menus 0)
+        elif (eq ?menus 1) then
+            (viewFlokemon)
+        elif (eq ?menus 2) then
+            (addFlokemon)
+        elif (eq ?menus 3) then
+            (updateFlokemon)
+        elif (eq ?menus 4) then
+            (removeFlokemon)
+        elif (eq ?menus 5) then
+            (findFlokemon)
         else
             (printout t "Thankyou..." crlf)
             (clear)
