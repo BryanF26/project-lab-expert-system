@@ -1,4 +1,4 @@
-package Java;
+package main;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -28,7 +28,7 @@ import jess.JessException;
 import jess.QueryResult;
 import jess.ValueVector;
 
-public class Gui extends JFrame {
+public class GUI extends JFrame {
 
 	JTable table = new JTable();
 	JTable fTable = new JTable();
@@ -50,7 +50,7 @@ public class Gui extends JFrame {
 	String[] water_column_strings = { "No.", "Name", "Damage", "Defense",
 			"Level", "Price" };
 
-	final Gui form = this;
+	final GUI form = this;
 
 	public void init() {
 		getContentPane().setLayout(new BorderLayout());
@@ -209,7 +209,7 @@ public class Gui extends JFrame {
 		return resizedImage;
 	}
 
-	public Gui() {
+	public GUI() {
 		// TODO Auto-generated constructor stub
 		setTitle("Flokemon Store");
 		setSize(500, 500);

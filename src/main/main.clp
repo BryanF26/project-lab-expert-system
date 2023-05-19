@@ -343,6 +343,8 @@
     )
     (assert (removeFire ?num))
     (run)
+    
+    (-- ?*idx*)
 )
 
 (deffunction removeFlokemonWater()
@@ -357,6 +359,8 @@
     )
     (assert (removeWater ?num))
     (run)
+    
+    (-- ?*idx*)
 )
 
 (deffunction removeFlokemon ()
