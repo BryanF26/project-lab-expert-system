@@ -15,6 +15,23 @@
     (slot price)
 )
 
+(deftemplate matchFlokemon
+    (slot name)
+    (slot damage)
+    (slot defense)
+    (slot level)
+    (slot burn_damage)
+    (slot price)
+    (slot type)
+)
+
+(deftemplate find
+    (slot power)
+    (slot defense)
+    (slot size)
+    (slot price)
+)
+
 (defglobal
     ?*idx* = 1
     ?*totalFire* = 5
@@ -396,13 +413,15 @@
     
     (bind ?power (promptString "Weak" "Strong" "Demanded power [Weak | Strong] : "))
     
-    (bind ?defense (promptString "Soft" "Hard" "Demanded type [Soft | Hard] : "))
+    (bind ?defense (promptString "Soft" "Hard" "Demanded defense [Soft | Hard] : "))
     
 	(bind ?level (promptIntegerWithLength 1 100 "Demanded minimum flokemon level [1 - 100] : "))
     
     (bind ?budget (promptIntegerWithLength 1000 1000000 "Budget for flokemon [1000 - 1000000] : "))
 
     (bind ?confirmation (promptString "Y" "N" "Are you sure to find this type of flokemon [Y | N] ? "))
+    
+    (assert (find (power ?power) (defense ?defense) (size ?level) (price ?budget)))
     
     (if (eq ?confirmation "Y") then
     	(new main.GUI)
@@ -427,11 +446,12 @@
     (flokemonWater (name "Vaporeon") (damage 900) (defense 120) (level 45) (price 80000))
 )
 
-
 (defquery retrieve-info
-	    
-	   
-    
+	(find (power ?power) (defense ?defense) (size ?size) (price ?price))
+)
+
+(defquery flokemon-found
+	(matchFlokemon (name ?name) (damage ?damage) (defense ?defense) (level ?level) (burn_damage ?burn_damage) (price ?price))
 )
 
 (deffunction mainFlokemon ()
