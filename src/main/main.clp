@@ -341,10 +341,10 @@
             (bind ?num 0)
         )
     )
+    (-- ?*idx*)
     (assert (removeFire ?num))
     (run)
     
-    (-- ?*idx*)
 )
 
 (deffunction removeFlokemonWater()
@@ -357,10 +357,10 @@
             (bind ?num 0)
         )
     )
+    (-- ?*idx*)
     (assert (removeWater ?num))
     (run)
     
-    (-- ?*idx*)
 )
 
 (deffunction removeFlokemon ()
