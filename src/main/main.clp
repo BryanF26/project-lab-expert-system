@@ -40,6 +40,7 @@
 )
 
 (defrule update-fire
+    ;?a adalah variabel inisiasi supaya defrule ini terpanggil
 	?a <- (updateFire ?num ?name ?damage ?defense ?level ?burnDamage ?price)
     ?i <- (flokemonFire (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (burnDamage ?bd) (price ?p))
 	=>
@@ -53,6 +54,7 @@
 )
 
 (defrule update-water
+    ;?a adalah variabel inisiasi supaya defrule ini terpanggil
 	?a <- (updateWater ?num ?name ?damage ?defense ?level ?price)
     ?i <- (flokemonWater (name ?n) (damage ?dmg) (defense ?def) (level ?lvl) (price ?p))
 	=>
@@ -261,7 +263,6 @@
         )
     )
     
-    (bind ?num (+ (- ?*totalFire* ?num) 1))
     
     (bind ?name (promptStringWithLength 5 25 "Insert Flokemon Name [5 - 25 Character] : "))
 
@@ -290,7 +291,6 @@
         )
     )
     
-    (bind ?num (+ (- ?*totalWater* ?num) 1))
     
     (bind ?name (promptStringWithLength 5 25 "Insert Flokemon Name [5 - 25 Character] : "))
 
@@ -341,7 +341,7 @@
             (bind ?num 0)
         )
     )
-    (-- ?*idx*)
+    (-- ?*totalFire*)
     (assert (removeFire ?num))
     (run)
     
@@ -357,7 +357,7 @@
             (bind ?num 0)
         )
     )
-    (-- ?*idx*)
+    (-- ?*totalWater*)
     (assert (removeWater ?num))
     (run)
     
@@ -405,7 +405,7 @@
     (bind ?confirmation (promptString "Y" "N" "Are you sure to find this type of flokemon [Y | N] ? "))
     
     (if (eq ?confirmation "Y") then
-    	
+    	(new main.GUI)
     )
 	
     (printout t "Press Enter To Continue..")
@@ -425,6 +425,13 @@
     (flokemonWater (name "Poliwhirl") (damage 500) (defense 90) (level 20) (price 250000))
     (flokemonWater (name "Staryu") (damage 800) (defense 70) (level 30) (price 50000))
     (flokemonWater (name "Vaporeon") (damage 900) (defense 120) (level 45) (price 80000))
+)
+
+
+(defquery retrieve-info
+	    
+	   
+    
 )
 
 (deffunction mainFlokemon ()

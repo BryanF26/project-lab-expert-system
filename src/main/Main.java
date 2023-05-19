@@ -1,5 +1,6 @@
 package main;
 
+import jess.JessException;
 import jess.Rete;
 
 public class Main {
@@ -10,9 +11,9 @@ public class Main {
 		
 		try {
 			engine = new Rete();
-			engine.batch("");
-		} catch (Exception e) {
-			// TODO: handle exception
+			engine.batch("main/main.clp");
+		} catch (JessException e) {
+			e.printStackTrace();
 		}
 		
 	}

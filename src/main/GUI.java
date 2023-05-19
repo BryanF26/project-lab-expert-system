@@ -30,6 +30,11 @@ import jess.ValueVector;
 
 public class GUI extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	JTable table = new JTable();
 	JTable fTable = new JTable();
 	JButton btnClose = new JButton("Close");
@@ -51,7 +56,7 @@ public class GUI extends JFrame {
 			"Level", "Price" };
 
 	final GUI form = this;
-
+	
 	public void init() {
 		getContentPane().setLayout(new BorderLayout());
 
