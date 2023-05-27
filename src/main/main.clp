@@ -315,11 +315,10 @@
 )
 
 (defrule delete-match-flokemon
-    ?a <- (deleteMatchFlokemon)
+    (deleteMatchFlokemon)
     ?i <- (matchFlokemon)
     =>
     (retract ?i)
-    (retract ?a)
 )
 
 (defrule delete-find
@@ -657,6 +656,7 @@
     (assert(deleteMatchFlokemon))
     (assert(deleteFind))
     (run)
+    (retract-string "(deleteMatchFlokemon)")
 
     (printout t "Press Enter To Continue..")
     (readline)
